@@ -1,70 +1,73 @@
-
-import React, {Component } from 'react';
-import Loading from './Loading';
-import Display from './Display';
-
+import React, { Component } from "react";
+import Loading from "./Loading";
+import Display from "./Display";
 
 class Pokemon extends Component {
-  constructor(){
+  constructor() {
     super();
     this.state = {
       pokemonData: [],
       loading: false,
-      query: '',
-    }
+      query: "",
+    };
   }
   // handleSearch function for search bar
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({
-      query: e.target.value
-    })
-  }
+      query: e.target.value,
+    });
+  };
   //  fetching data from APIS
   componentDidMount = () => {
-    this.setState({loading: true});
-      fetch(`https://pokeapi.co/api/v2/pokemon/?offset=0&limit=500`)
-        .then(res => res.json())
-        .then (({results}) => {
-        const data = results.map((poke, i) =>
-        ({name:poke.name , img:`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png`})
-        )
-        return this.setState({pokemonData: data, loading:false});
-        
-    });
-    
-    }
-  
-  render(){
-    const { loading, pokemonData, query} = this.state;
-    let dispayArr = []
-    if(query) {
-      const  regexp = new RegExp(query, 'i')
-      dispayArr = pokemonData.filter(poke => regexp.test(poke.name))
+    this.setState({ loading: true });
+    fetch(`https://pokeapi.co/api/v2/pokemon/?offset=0&limit=500`)
+      .then((res) => res.json())
+      .then(({ results }) => {
+        const data = results.map((poke, i) => ({
+          name: poke.name,
+          img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
+            i + 1
+          }.png`,
+        }));
+        return this.setState({ pokemonData: data, loading: false });
+      });
+  };
+
+  render() {
+    const { loading, pokemonData, query } = this.state;
+    let dispayArr = [];
+    if (query) {
+      const regexp = new RegExp(query, "i");
+      dispayArr = pokemonData.filter((poke) => regexp.test(poke.name));
     } else {
-      dispayArr = pokemonData
+      dispayArr = pokemonData;
     }
 
     return (
-      <React.Fragment>
-      <header>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/International_Pok%C3%A9mon_logo.svg/1280px-International_Pok%C3%A9mon_logo.svg.png"  alt="title"/>
-      </header>
-        <div className="search">
+      <div className="parent-wrapper">
+        <div class="search-container">
           <input
+            class="search-bar"
             type="text"
-            className="search-bar"
+            placeholder="Search Pokemon by name"
             onChange={this.handleChange}
-            placeholder="Enter pokemon name..."
-            autoFocus
           />
+          <i class="fa fa-search"></i>
         </div>
-        <div className="pokemon-container" style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr',gridGap:'30px'}}>
+        <div className="pokemon-card">
           {
-            loading ? <Loading /> : dispayArr.map((pName,img) => <Display key={pName.name} {...pName} {...img} />)
+            query && dispayArr.length ===0 ? <h1>No Pokemon founds</h1>: null
           }
+          {loading ? (
+            <Loading />
+          ) : (
+            dispayArr.map((pName, img) => (
+              <Display key={pName.name} {...pName} {...img} />
+            ))
+          )}
         </div>
-        </React.Fragment>
-    )
+      </div>
+    );
   }
 }
 export default Pokemon;
